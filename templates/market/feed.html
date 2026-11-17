@@ -1,0 +1,349 @@
+{% extends "base.html" %}
+
+{% block title %}The Market - SwapMe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .feed-container {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .card-listing {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        overflow: hidden;
+    }
+
+    .listing-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        background: #f0f0f0;
+    }
+
+    .listing-content {
+        padding: 20px;
+    }
+
+    .listing-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .listing-description {
+        color: #666;
+        margin-bottom: 15px;
+        line-height: 1.6;
+    }
+
+    .listing-tags {
+        margin-bottom: 15px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .tag {
+        background: var(--primary-yellow);
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        color: var(--dark-text);
+        font-weight: 500;
+    }
+
+    .listing-owner {
+        display: flex;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid #eee;
+        margin-bottom: 15px;
+    }
+
+    .owner-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-yellow);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        margin-right: 10px;
+        color: var(--dark-text);
+    }
+
+    .owner-name {
+        font-weight: 600;
+        color: var(--dark-text);
+    }
+
+    .listing-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .like-btn {
+        background: var(--primary-yellow);
+        color: var(--dark-text);
+        border: 2px solid var(--secondary-yellow);
+    }
+
+    .like-btn:hover {
+        background: var(--secondary-yellow);
+        transform: scale(1.05);
+    }
+
+    .like-btn.liked {
+        background: var(--secondary-yellow);
+        color: white;
+    }
+
+    .trade-btn {
+        background: var(--secondary-yellow);
+        color: white;
+    }
+
+    .trade-btn:hover {
+        background: #FF8C00;
+        transform: scale(1.05);
+    }
+
+    .dislike-btn {
+        background: #f0f0f0;
+        color: var(--dark-text);
+        border: 2px solid #ddd;
+    }
+
+    .dislike-btn:hover {
+        background: #e0e0e0;
+        transform: scale(1.05);
+    }
+
+    .view-profile-btn {
+        background: white;
+        color: var(--dark-text);
+        border: 2px solid var(--primary-yellow);
+        padding: 0;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: auto;
+    }
+
+    .view-profile-btn:hover {
+        background: var(--primary-yellow);
+    }
+
+    .empty-feed {
+        text-align: center;
+        padding: 60px 20px;
+        color: #666;
+    }
+
+    .empty-feed i {
+        font-size: 3rem;
+        color: var(--secondary-yellow);
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    .feed-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .feed-header h2 {
+        color: #333;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .reset-btn {
+        background: var(--secondary-yellow);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+    }
+
+    .reset-btn:hover {
+        background: #FF8C00;
+        transform: translateY(-2px);
+    }
+
+    .post-type-badge {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-left: 10px;
+    }
+
+    .post-type-badge.trade {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    .post-type-badge.freebie {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="feed-container">
+    <div class="feed-header">
+        <h2>The Market</h2>
+        <a href="{% url 'reset_feed' %}" class="reset-btn" title="Reset all likes/dislikes to refresh your feed">
+            <i class="bi bi-arrow-clockwise"></i> Refresh Feed
+        </a>
+    </div>
+
+    {% if listings %}
+        {% for listing in listings %}
+        <div class="card-listing" id="listing-{{ listing.id }}">
+            {% if listing.image %}
+                <img src="{{ listing.image.url }}" alt="{{ listing.title }}" class="listing-image">
+            {% else %}
+                <div class="listing-image" style="display: flex; align-items: center; justify-content: center; background: #f0f0f0;">
+                    <i class="bi bi-image" style="font-size: 3rem; color: #ccc;"></i>
+                </div>
+            {% endif %}
+
+            <div class="listing-content">
+                <h3 class="listing-title">
+                    {{ listing.title }}
+                    <span class="post-type-badge {% if listing.post_type == 'FREEBIE' %}freebie{% else %}trade{% endif %}">
+                        {% if listing.post_type == 'FREEBIE' %}
+                            <i class="bi bi-gift"></i> Freebie
+                        {% else %}
+                            <i class="bi bi-arrow-left-right"></i> Trade
+                        {% endif %}
+                    </span>
+                </h3>
+                <p class="listing-description">{{ listing.description }}</p>
+
+                {% if listing.tags %}
+                <div class="listing-tags">
+                    {% for tag in listing.get_tags_list %}
+                        <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <div class="listing-owner">
+                    <div class="owner-avatar">
+                        {{ listing.owner.first_name|default:listing.owner.username|first|upper }}
+                    </div>
+                    <div>
+                        <div class="owner-name">{{ listing.owner.first_name|default:listing.owner.username }}</div>
+                        <small style="color: #999;">View stall</small>
+                    </div>
+                    <a href="{% url 'user_stall' listing.owner.id %}" class="view-profile-btn" title="View stall">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+
+                <div class="listing-actions">
+                    <button class="action-btn like-btn {% if listing.id in liked_listing_ids %}liked{% endif %}" 
+                            onclick="toggleLike({{ listing.id }})">
+                        <i class="bi bi-heart-fill"></i> Like
+                    </button>
+                    <button class="action-btn dislike-btn" onclick="dislike({{ listing.id }})">
+                        <i class="bi bi-x-lg"></i> Pass
+                    </button>
+                    <a href="{% url 'send_trade_offer' listing.id %}" class="action-btn trade-btn">
+                        <i class="bi bi-arrow-left-right"></i> Trade
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-feed">
+            <i class="bi bi-inbox"></i>
+            <h3>No listings yet!</h3>
+            <p>Check back soon for items to trade.</p>
+        </div>
+    {% endif %}
+</div>
+
+<script>
+    function toggleLike(listingId) {
+        fetch(`/market/like/${listingId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'X-Requested-With': 'XMLHttpRequest',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const btn = event.target.closest('.like-btn');
+            btn.classList.toggle('liked');
+        });
+    }
+
+    function dislike(listingId) {
+        const card = document.getElementById(`listing-${listingId}`);
+        card.style.animation = 'slideOut 0.3s ease';
+        setTimeout(() => {
+            card.remove();
+        }, 300);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

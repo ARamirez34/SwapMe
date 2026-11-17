@@ -1,0 +1,399 @@
+{% extends "base.html" %}
+
+{% block title %}My Stall - SwapMe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stall-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .stall-header {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .stall-header h2 {
+        color: #333;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .add-listing-btn {
+        background: var(--secondary-yellow);
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .add-listing-btn:hover {
+        background: #FF8C00;
+        transform: translateY(-2px);
+    }
+
+    .listings-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .listing-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .listing-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        transform: translateY(-5px);
+    }
+
+    .listing-card-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+        background: #f0f0f0;
+    }
+
+    .listing-card-content {
+        padding: 15px;
+    }
+
+    .listing-card-title {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .listing-card-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 12px;
+    }
+
+    .card-action-btn {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        border-radius: 4px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .edit-btn {
+        background: var(--primary-yellow);
+        color: var(--dark-text);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .edit-btn:hover {
+        background: var(--secondary-yellow);
+        color: white;
+    }
+
+    .delete-btn {
+        background: #ff6b6b;
+        color: white;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .delete-btn:hover {
+        background: #ff5252;
+    }
+
+    .section {
+        margin-bottom: 40px;
+    }
+
+    .section-title {
+        color: #333;
+        font-weight: 700;
+        font-size: 1.3rem;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 2px solid var(--primary-yellow);
+    }
+
+    .empty-section {
+        text-align: center;
+        padding: 40px 20px;
+        background: white;
+        border-radius: 10px;
+        color: #666;
+    }
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .stat-box {
+        background: var(--primary-yellow);
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 1.8rem;
+        font-weight: 700;
+        color: var(--secondary-yellow);
+    }
+
+    .stat-label {
+        color: var(--dark-text);
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .profile-section {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .profile-header {
+        display: flex;
+        gap: 30px;
+        align-items: flex-start;
+        margin-bottom: 20px;
+    }
+
+    .profile-pic-wrapper {
+        flex-shrink: 0;
+    }
+
+    .profile-pic {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 4px solid var(--secondary-yellow);
+        background: #f0f0f0;
+        box-shadow: 0 4px 12px rgba(255, 165, 0, 0.3);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .profile-pic:hover {
+        transform: scale(1.05);
+        box-shadow: 0 6px 16px rgba(255, 165, 0, 0.4);
+    }
+
+    .profile-pic.default {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 4rem;
+        color: #ddd;
+        border-radius: 50%;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+    .profile-info h3 {
+        color: #333;
+        font-weight: 700;
+        margin-bottom: 10px;
+        font-size: 1.5rem;
+    }
+
+    .reliability-badge {
+        display: inline-block;
+        background: var(--primary-yellow);
+        padding: 8px 16px;
+        border-radius: 20px;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 15px;
+        font-size: 0.95rem;
+    }
+
+    .reliability-icon {
+        margin-right: 5px;
+        color: var(--secondary-yellow);
+    }
+
+    .profile-bio {
+        color: #666;
+        line-height: 1.6;
+        margin-top: 15px;
+        font-style: italic;
+    }
+
+    .profile-bio.empty {
+        color: #999;
+    }
+
+    .edit-profile-btn {
+        background: var(--secondary-yellow);
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 15px;
+        transition: all 0.3s ease;
+    }
+
+    .edit-profile-btn:hover {
+        background: #FF8C00;
+        transform: translateY(-2px);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="stall-container">
+    <!-- Profile Section -->
+    <div class="profile-section">
+        <div class="profile-header">
+            <div class="profile-pic-wrapper">
+                {% if user.profile_pic %}
+                    <img src="{{ user.profile_pic.url }}" alt="Profile Picture" class="profile-pic">
+                {% else %}
+                    <div class="profile-pic default">
+                        <i class="bi bi-person-circle"></i>
+                    </div>
+                {% endif %}
+            </div>
+            <div class="profile-info">
+                <h3>{{ user.get_full_name|default:user.username }}</h3>
+                <div class="reliability-badge">
+                    <i class="bi bi-star-fill reliability-icon"></i>
+                    {{ user.trades_completed }} Trades Completed
+                </div>
+                <div class="profile-bio {% if not user.bio %}empty{% endif %}">
+                    {% if user.bio %}
+                        {{ user.bio }}
+                    {% else %}
+                        <em>No bio added yet. <a href="{% url 'edit_profile' %}">Add one</a>!</em>
+                    {% endif %}
+                </div>
+                <a href="{% url 'edit_profile' %}" class="edit-profile-btn">
+                    <i class="bi bi-pencil"></i> Edit Profile
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="stall-header">
+        <h2>My Stall</h2>
+        <a href="{% url 'create_listing' %}" class="add-listing-btn">
+            <i class="bi bi-plus-circle"></i> Add New Listing
+        </a>
+    </div>
+
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-number">{{ listings|length }}</div>
+            <div class="stat-label">My Listings</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{{ liked_listings|length }}</div>
+            <div class="stat-label">Saved Items</div>
+        </div>
+    </div>
+
+    <!-- My Listings Section -->
+    <div class="section">
+        <h3 class="section-title"><i class="bi bi-shop"></i> My Listings</h3>
+        {% if listings %}
+            <div class="listings-grid">
+                {% for listing in listings %}
+                <div class="listing-card">
+                    {% if listing.image %}
+                        <img src="{{ listing.image.url }}" alt="{{ listing.title }}" class="listing-card-image">
+                    {% else %}
+                        <div class="listing-card-image" style="display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-image" style="font-size: 2rem; color: #ccc;"></i>
+                        </div>
+                    {% endif %}
+                    <div class="listing-card-content">
+                        <h4 class="listing-card-title">{{ listing.title }}</h4>
+                        <div class="listing-card-actions">
+                            <a href="{% url 'edit_listing' listing.id %}" class="card-action-btn edit-btn">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'delete_listing' listing.id %}" class="card-action-btn delete-btn">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-section">
+                <i class="bi bi-inbox" style="font-size: 2rem; color: var(--secondary-yellow); margin-bottom: 10px; display: block;"></i>
+                <p>No listings yet. <a href="{% url 'create_listing' %}">Create your first listing!</a></p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Liked/Saved Listings Section -->
+    <div class="section">
+        <h3 class="section-title"><i class="bi bi-heart-fill"></i> Saved Items</h3>
+        {% if liked_listings %}
+            <div class="listings-grid">
+                {% for listing in liked_listings %}
+                <div class="listing-card">
+                    {% if listing.image %}
+                        <img src="{{ listing.image.url }}" alt="{{ listing.title }}" class="listing-card-image">
+                    {% else %}
+                        <div class="listing-card-image" style="display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-image" style="font-size: 2rem; color: #ccc;"></i>
+                        </div>
+                    {% endif %}
+                    <div class="listing-card-content">
+                        <h4 class="listing-card-title">{{ listing.title }}</h4>
+                        <small style="color: #666;">by {{ listing.owner.first_name|default:listing.owner.username }}</small>
+                        <div class="listing-card-actions">
+                            <a href="{% url 'send_trade_offer' listing.id %}" class="card-action-btn" style="background: var(--secondary-yellow); color: white;">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </a>
+                            <a href="{% url 'user_stall' listing.owner.id %}" class="card-action-btn" style="background: var(--primary-yellow); color: var(--dark-text);">
+                                <i class="bi bi-shop"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="empty-section">
+                <i class="bi bi-heart" style="font-size: 2rem; color: var(--secondary-yellow); margin-bottom: 10px; display: block;"></i>
+                <p>No saved items yet. Like items from the market to see them here!</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

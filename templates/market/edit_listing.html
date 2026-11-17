@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Listing - SwapMe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 0 auto;
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-container h2 {
+        color: #333;
+        font-weight: 700;
+        margin-bottom: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        padding: 12px 15px;
+        font-size: 1rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: var(--secondary-yellow);
+        box-shadow: 0 0 0 0.2rem rgba(255, 165, 0, 0.25);
+    }
+
+    label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .btn-submit {
+        background: var(--secondary-yellow);
+        color: white;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1rem;
+    }
+
+    .btn-submit:hover {
+        background: #FF8C00;
+        transform: translateY(-2px);
+    }
+
+    .btn-cancel {
+        background: #f0f0f0;
+        color: #333;
+        padding: 12px 30px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        font-size: 1rem;
+        margin-top: 10px;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-cancel:hover {
+        background: #e0e0e0;
+    }
+
+    .form-text {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .post-type-group {
+        display: flex;
+        gap: 30px;
+        margin-bottom: 20px;
+    }
+
+    .post-type-option {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+    }
+
+    .post-type-option:hover {
+        border-color: var(--secondary-yellow);
+        background: rgba(255, 165, 0, 0.05);
+    }
+
+    .post-type-option input[type="radio"] {
+        cursor: pointer;
+        width: 20px;
+        height: 20px;
+        accent-color: var(--secondary-yellow);
+    }
+
+    .post-type-option label {
+        margin: 0;
+        cursor: pointer;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .post-type-option input[type="radio"]:checked + label {
+        color: var(--secondary-yellow);
+    }
+
+    .post-type-desc {
+        font-size: 0.85rem;
+        color: #666;
+        margin-top: 5px;
+    }
+
+    .tags-container {
+        border: 2px solid #ddd;
+        border-radius: 5px;
+        padding: 12px 15px;
+        background: white;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+        min-height: 45px;
+    }
+
+    .tags-container:focus-within {
+        border-color: var(--secondary-yellow);
+        box-shadow: 0 0 0 0.2rem rgba(255, 165, 0, 0.25);
+    }
+
+    .tag-badge {
+        background: var(--secondary-yellow);
+        color: white;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        white-space: nowrap;
+    }
+
+    .tag-badge button {
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+        padding: 0;
+        font-size: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 20px;
+        height: 20px;
+    }
+
+    .tag-badge button:hover {
+        opacity: 0.8;
+    }
+
+    #tagInput {
+        border: none;
+        outline: none;
+        font-size: 1rem;
+        flex: 1;
+        min-width: 150px;
+        background: transparent;
+    }
+
+    #tagInput::placeholder {
+        color: #999;
+    }
+
+    .current-image {
+        margin-bottom: 15px;
+    }
+
+    .current-image img {
+        max-width: 200px;
+        border-radius: 5px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h2><i class="bi bi-pencil"></i> Edit Listing</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            {% for error in form.non_field_errors %}
+                <div class="alert alert-danger">{{ error }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.title.id_for_label }}">{{ form.title.label }}</label>
+            {{ form.title }}
+            {% if form.title.errors %}
+                <div class="text-danger small">{{ form.title.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.description.id_for_label }}">{{ form.description.label }}</label>
+            {{ form.description }}
+            {% if form.description.errors %}
+                <div class="text-danger small">{{ form.description.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            {% if listing.image %}
+                <div class="current-image">
+                    <label>Current Image:</label>
+                    <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
+                </div>
+            {% endif %}
+            <label for="{{ form.image.id_for_label }}">{{ form.image.label }}</label>
+            {{ form.image }}
+            <p class="form-text">Supported formats: JPG, PNG, GIF (Max 5MB)</p>
+            {% if form.image.errors %}
+                <div class="text-danger small">{{ form.image.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>Tags</label>
+            <div class="tags-container" id="tagsContainer">
+                <input type="text" id="tagInput" placeholder="Add tags then press Enter">
+            </div>
+            <input type="hidden" id="tagsInput" name="tags" value="{{ listing.tags }}">
+            <p class="form-text">Press Enter to add a tag. No duplicates allowed.</p>
+            {% if form.tags.errors %}
+                <div class="text-danger small">{{ form.tags.errors }}</div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label>Post Type</label>
+            <div class="post-type-group">
+                {% for value, label in form.post_type.field.choices %}
+                    <div class="post-type-option">
+                        <input type="radio" id="post_type_{{ forloop.counter }}" name="post_type" value="{{ value }}" 
+                            {% if form.post_type.value == value or forloop.first %}checked{% endif %} required>
+                        <label for="post_type_{{ forloop.counter }}">
+                            {% if value == 'TRADE' %}
+                                <i class="bi bi-arrow-left-right"></i>
+                            {% else %}
+                                <i class="bi bi-gift"></i>
+                            {% endif %}
+                            {{ label }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+            {% if form.post_type.errors %}
+                <div class="text-danger small">{{ form.post_type.errors }}</div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn-submit"><i class="bi bi-check-circle"></i> Update Listing</button>
+        <a href="{% url 'my_stall' %}" class="btn-cancel"><i class="bi bi-x-circle"></i> Cancel</a>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const tagsContainer = document.getElementById('tagsContainer');
+        const tagInput = document.getElementById('tagInput');
+        const tagsInputField = document.getElementById('tagsInput');
+        const form = document.querySelector('form');
+        let tags = [];
+
+        // Load existing tags if editing
+        const existingTags = tagsInputField.value.trim();
+        if (existingTags) {
+            tags = existingTags.split(' ').filter(tag => tag.trim());
+            renderTags();
+        }
+
+        if (tagInput) {
+            tagInput.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const tag = tagInput.value.trim();
+                    
+                    if (tag && !tags.includes(tag)) {
+                        tags.push(tag);
+                        tagInput.value = '';
+                        renderTags();
+                        updateTagsInput();
+                    }
+                }
+            });
+        }
+
+        function renderTags() {
+            // Remove old tag badges
+            const oldBadges = tagsContainer.querySelectorAll('.tag-badge');
+            oldBadges.forEach(badge => badge.remove());
+
+            // Add new tag badges
+            tags.forEach((tag, index) => {
+                const badge = document.createElement('div');
+                badge.className = 'tag-badge';
+                badge.dataset.tagIndex = index;
+                
+                const tagLabel = document.createElement('span');
+                tagLabel.textContent = tag;
+                badge.appendChild(tagLabel);
+                
+                const button = document.createElement('button');
+                button.type = 'button';
+                button.innerHTML = '<i class="bi bi-x"></i>';
+                button.dataset.index = index;
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    removeTag(index);
+                });
+                badge.appendChild(button);
+                
+                // Insert before the input field
+                tagsContainer.insertBefore(badge, tagInput);
+            });
+        }
+
+        function removeTag(index) {
+            tags.splice(index, 1);
+            renderTags();
+            updateTagsInput();
+        }
+
+        function updateTagsInput() {
+            tagsInputField.value = tags.join(' ');
+        }
+
+        // Update tags input on form submission
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                updateTagsInput();
+            });
+        }
+    });
+</script>
+{% endblock %}

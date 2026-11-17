@@ -1,0 +1,284 @@
+{% extends "base.html" %}
+
+{% block title %}Trade Offers - SwapMe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .offers-container {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .offers-header {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .offers-header h2 {
+        color: #333;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .offer-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+        border-left: 4px solid var(--secondary-yellow);
+    }
+
+    .offer-card.accepted {
+        border-left-color: #28a745;
+    }
+
+    .offer-card.declined {
+        border-left-color: #ff6b6b;
+    }
+
+    .offer-header {
+        background: var(--primary-yellow);
+        padding: 15px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .offer-from {
+        font-weight: 700;
+        color: #333;
+    }
+
+    .offer-status {
+        font-size: 0.85rem;
+        font-weight: 600;
+        padding: 5px 12px;
+        border-radius: 20px;
+        background: white;
+        color: var(--dark-text);
+    }
+
+    .offer-status.accepted {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .offer-status.declined {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .offer-content {
+        padding: 20px;
+    }
+
+    .listings-row {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 15px;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .listing-info {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .listing-info img {
+        width: 100%;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .listing-title {
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 5px;
+    }
+
+    .listing-owner {
+        font-size: 0.85rem;
+        color: #666;
+    }
+
+    .arrow {
+        font-size: 1.5rem;
+        color: var(--secondary-yellow);
+        text-align: center;
+    }
+
+    .offer-message {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        line-height: 1.6;
+        color: #666;
+    }
+
+    .offer-message strong {
+        display: block;
+        color: #333;
+        margin-bottom: 10px;
+    }
+
+    .offer-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .offer-btn {
+        flex: 1;
+        padding: 10px 15px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+    }
+
+    .accept-btn {
+        background: #28a745;
+        color: white;
+    }
+
+    .accept-btn:hover {
+        background: #218838;
+    }
+
+    .decline-btn {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .decline-btn:hover {
+        background: #ff5252;
+    }
+
+    .empty-offers {
+        text-align: center;
+        padding: 60px 20px;
+        background: white;
+        border-radius: 10px;
+        color: #666;
+    }
+
+    .empty-offers i {
+        font-size: 3rem;
+        color: var(--secondary-yellow);
+        margin-bottom: 20px;
+        display: block;
+    }
+
+    .offer-date {
+        font-size: 0.85rem;
+        color: #999;
+        margin-top: 10px;
+    }
+
+    .status-inactive {
+        opacity: 0.7;
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="offers-container">
+    <div class="offers-header">
+        <h2><i class="bi bi-arrow-left-right"></i> Trade Offers</h2>
+    </div>
+
+    {% if offers %}
+        {% for offer in offers %}
+        <div class="offer-card {% if offer.status == 'ACCEPTED' %}accepted{% elif offer.status == 'DECLINED' %}declined{% endif %}">
+            <div class="offer-header">
+                <div class="offer-from">
+                    <i class="bi bi-person-circle"></i> {{ offer.from_user.first_name|default:offer.from_user.username }}
+                </div>
+                <span class="offer-status {% if offer.status == 'ACCEPTED' %}accepted{% elif offer.status == 'DECLINED' %}declined{% endif %}">
+                    {{ offer.get_status_display }}
+                </span>
+            </div>
+
+            <div class="offer-content">
+                <div class="listings-row">
+                    <div class="listing-info">
+                        {% if offer.offered_listing.image %}
+                            <img src="{{ offer.offered_listing.image.url }}" alt="{{ offer.offered_listing.title }}">
+                        {% else %}
+                            <div style="width: 100%; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
+                                <i class="bi bi-image" style="font-size: 2rem; color: #ccc;"></i>
+                            </div>
+                        {% endif %}
+                        <div class="listing-title">{{ offer.offered_listing.title }}</div>
+                        <div class="listing-owner">by {{ offer.from_user.first_name|default:offer.from_user.username }}</div>
+                    </div>
+
+                    <div class="arrow">
+                        <i class="bi bi-arrow-left-right"></i>
+                    </div>
+
+                    <div class="listing-info">
+                        {% if offer.listing.image %}
+                            <img src="{{ offer.listing.image.url }}" alt="{{ offer.listing.title }}">
+                        {% else %}
+                            <div style="width: 100%; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 5px;">
+                                <i class="bi bi-image" style="font-size: 2rem; color: #ccc;"></i>
+                            </div>
+                        {% endif %}
+                        <div class="listing-title">{{ offer.listing.title }}</div>
+                        <div class="listing-owner">by {{ offer.listing.owner.first_name|default:offer.listing.owner.username }}</div>
+                    </div>
+                </div>
+
+                {% if offer.message %}
+                <div class="offer-message">
+                    <strong>Message:</strong>
+                    {{ offer.message }}
+                </div>
+                {% endif %}
+
+                <div class="offer-date">
+                    Sent on {{ offer.created_at|date:"M d, Y \a\t H:i" }}
+                </div>
+
+                {% if offer.status == 'PENDING' %}
+                <div class="offer-actions">
+                    <form method="POST" action="{% url 'update_trade_offer' offer.id %}" style="flex: 1;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="accept">
+                        <button type="submit" class="offer-btn accept-btn">
+                            <i class="bi bi-check-circle"></i> Accept
+                        </button>
+                    </form>
+                    <form method="POST" action="{% url 'update_trade_offer' offer.id %}" style="flex: 1;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="decline">
+                        <button type="submit" class="offer-btn decline-btn">
+                            <i class="bi bi-x-circle"></i> Decline
+                        </button>
+                    </form>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-offers">
+            <i class="bi bi-inbox"></i>
+            <h3>No trade offers yet!</h3>
+            <p>When someone wants to trade with you, they'll appear here.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

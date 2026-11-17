@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block title %}Delete Listing - SwapMe{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-container {
+        max-width: 500px;
+        margin: 0 auto;
+        background: white;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+    }
+
+    .delete-icon {
+        font-size: 3rem;
+        color: #ff6b6b;
+        margin-bottom: 20px;
+    }
+
+    .delete-container h2 {
+        color: #333;
+        font-weight: 700;
+        margin-bottom: 10px;
+    }
+
+    .delete-container p {
+        color: #666;
+        margin-bottom: 30px;
+        line-height: 1.6;
+    }
+
+    .listing-info {
+        background: var(--primary-yellow);
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .listing-info img {
+        max-width: 200px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+    }
+
+    .listing-info h4 {
+        color: #333;
+        font-weight: 700;
+        margin: 10px 0;
+    }
+
+    .button-group {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 5px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+        text-decoration: none;
+    }
+
+    .btn-delete {
+        background: #ff6b6b;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #ff5252;
+    }
+
+    .btn-cancel {
+        background: #f0f0f0;
+        color: #333;
+    }
+
+    .btn-cancel:hover {
+        background: #e0e0e0;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="delete-container">
+    <div class="delete-icon">
+        <i class="bi bi-exclamation-circle"></i>
+    </div>
+
+    <h2>Delete Listing?</h2>
+    <p>Are you sure you want to delete this listing? This action cannot be undone.</p>
+
+    <div class="listing-info">
+        {% if listing.image %}
+            <img src="{{ listing.image.url }}" alt="{{ listing.title }}">
+        {% else %}
+            <div style="width: 200px; height: 150px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; border-radius: 5px; margin: 0 auto 10px;">
+                <i class="bi bi-image" style="font-size: 2rem; color: #ccc;"></i>
+            </div>
+        {% endif %}
+        <h4>{{ listing.title }}</h4>
+        <p style="margin: 0; color: #666; font-size: 0.9rem;">{{ listing.description|truncatewords:20 }}</p>
+    </div>
+
+    <div class="button-group">
+        <form method="POST" style="flex: 1;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-delete" style="width: 100%;">
+                <i class="bi bi-trash"></i> Delete Permanently
+            </button>
+        </form>
+        <a href="{% url 'my_stall' %}" class="btn btn-cancel">
+            <i class="bi bi-x-circle"></i> Cancel
+        </a>
+    </div>
+</div>
+{% endblock %}
